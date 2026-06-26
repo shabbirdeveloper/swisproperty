@@ -404,6 +404,11 @@
     size: A4;
     margin: 0;
   }
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
   .br-root {
     background: #fff;
     padding: 0;
@@ -412,10 +417,18 @@
     display: none !important;
   }
   .br-page {
+    /* Slightly under A4 so a full page never spills onto a blank one */
+    height: 296mm;
     margin: 0;
     box-shadow: none;
+    overflow: hidden;
     page-break-after: always;
     break-after: page;
+  }
+  /* No forced break after the final page (prevents a trailing blank page) */
+  .br-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
   }
 }
 
