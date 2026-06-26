@@ -71,7 +71,7 @@ export default function Navbar() {
                 to={link.to}
                 end={link.end}
                 className={({ isActive }) =>
-                  `relative text-sm font-medium transition-colors duration-200 ${
+                  `relative text-xs font-semibold uppercase tracking-wider transition-colors duration-200 ${
                     isActive && link.end
                       ? "text-charcoal"
                       : "text-charcoal/70 hover:text-gold"
@@ -192,7 +192,7 @@ export default function Navbar() {
               <li key={link.label}>
                 <Link
                   to={link.to}
-                  className="block rounded-lg px-2 py-3 text-base font-medium text-charcoal/80 transition hover:bg-cloud hover:text-gold"
+                  className="block rounded-lg px-2 py-3 text-sm font-semibold uppercase tracking-wider text-charcoal/80 transition hover:bg-cloud hover:text-gold"
                 >
                   {link.label}
                 </Link>
