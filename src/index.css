@@ -179,34 +179,12 @@
   color: #888780;
 }
 .br-content {
-  position: relative;
-  isolation: isolate;
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 13mm 16mm;
   min-height: 0;
-  overflow: hidden;
-}
-/* Aurora gold glows — soft gradient depth behind the page content */
-.br-content::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(
-      120% 75% at 100% 0%,
-      rgba(184, 146, 74, 0.16),
-      transparent 52%
-    ),
-    radial-gradient(
-      100% 65% at 0% 100%,
-      rgba(184, 146, 74, 0.11),
-      transparent 56%
-    ),
-    linear-gradient(180deg, #ffffff 0%, #fcfaf5 100%);
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  background: #ffffff;
 }
 .br-eyebrow {
   font-size: 10px;
