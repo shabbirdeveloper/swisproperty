@@ -1,15 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MapPin, Home, Banknote, BedDouble, Bath } from "lucide-react";
+import { Search, MapPin, Home, BedDouble, Bath } from "lucide-react";
 import { propertyTypes, locations } from "../data/sampleProperties.js";
+import PriceRangeSlider from "./PriceRangeSlider.jsx";
 
-const priceRanges = [
-  { label: "Any Price", min: "", max: "" },
-  { label: "Up to CHF 1M", min: "", max: "1000000" },
-  { label: "CHF 1M – 3M", min: "1000000", max: "3000000" },
-  { label: "CHF 3M – 6M", min: "3000000", max: "6000000" },
-  { label: "CHF 6M+", min: "6000000", max: "" },
-];
+const PRICE_MAX = 10000000;
 
 // Defined at module scope so the text input is not remounted on each keystroke.
 const Wrap = ({ icon: Icon, children }) => (
@@ -27,7 +22,7 @@ export default function SearchBar() {
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState("");
-  const [priceIdx, setPriceIdx] = useState(0);
+  const [price, setPrice] = useState({ min: 0, max: PRICE_MAX });
   const [bedrooms, setBedrooms] = useState("");
   const [bathrooms, setBathrooms] = useState("");
 
@@ -37,9 +32,8 @@ export default function SearchBar() {
     if (keyword) params.set("keyword", keyword);
     if (location) params.set("location", location);
     if (propertyType) params.set("propertyType", propertyType);
-    const range = priceRanges[priceIdx];
-    if (range.min) params.set("minPrice", range.min);
-    if (range.max) params.set("maxPrice", range.max);
+    if (price.min > 0) params.set("minPrice", String(price.min));
+    if (price.max < PRICE_MAX) params.set("maxPrice", String(price.max));
     if (bedrooms) params.set("bedrooms", bedrooms);
     if (bathrooms) params.set("bathrooms", bathrooms);
     navigate(`/listings?${params.toString()}`);
@@ -50,6 +44,17 @@ export default function SearchBar() {
       onSubmit={handleSearch}
       className="w-full rounded-2xl border border-white/40 bg-white/95 p-4 shadow-lift backdrop-blur sm:rounded-3xl sm:p-5"
     >
+      {/* Price range bar (before the search fields) */}
+      <div className="mb-4 rounded-xl bg-cloud px-4 py-3">
+        <PriceRangeSlider
+          min={0}
+          max={PRICE_MAX}
+          step={50000}
+          value={price}
+          onChange={setPrice}
+        />
+      </div>
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Wrap icon={Search}>
           <input
@@ -85,20 +90,6 @@ export default function SearchBar() {
             {propertyTypes.map((t) => (
               <option key={t} value={t}>
                 {t}
-              </option>
-            ))}
-          </select>
-        </Wrap>
-
-        <Wrap icon={Banknote}>
-          <select
-            value={priceIdx}
-            onChange={(e) => setPriceIdx(Number(e.target.value))}
-            className="field-luxe pl-9 appearance-none"
-          >
-            {priceRanges.map((r, i) => (
-              <option key={r.label} value={i}>
-                {r.label}
               </option>
             ))}
           </select>

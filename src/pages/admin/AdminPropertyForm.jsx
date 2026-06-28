@@ -8,7 +8,12 @@ import {
   uploadImage,
 } from "../../services/properties.js";
 import { getAgents } from "../../services/agents.js";
-import { propertyTypes, locations, statuses } from "../../data/sampleProperties.js";
+import {
+  propertyTypes,
+  locations,
+  statuses,
+  landmarkTypes,
+} from "../../data/sampleProperties.js";
 import { isSupabaseConfigured } from "../../lib/supabase.js";
 
 const slugify = (s) =>
@@ -517,14 +522,7 @@ export default function AdminPropertyForm({
                 onChange={(e) => updateNearby(i, "type", e.target.value)}
                 className="field-luxe sm:w-44"
               >
-                {[
-                  "City Center",
-                  "School",
-                  "Hospital",
-                  "Shopping Mall",
-                  "Public Transport",
-                  "Airport",
-                ].map((t) => (
+                {landmarkTypes.map((t) => (
                   <option key={t}>{t}</option>
                 ))}
               </select>

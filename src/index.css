@@ -81,6 +81,45 @@
   }
 }
 
+/* Dual-range price slider */
+.dual-range {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.dual-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #b8924a;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(26, 26, 26, 0.35);
+  cursor: pointer;
+}
+.dual-range::-moz-range-thumb {
+  pointer-events: auto;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #b8924a;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+}
+.dual-range::-webkit-slider-runnable-track,
+.dual-range::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
 /* Hide scrollbar for filter chips row */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

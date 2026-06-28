@@ -108,6 +108,18 @@ export default function PropertyCard({ property }) {
           </span>
         </div>
 
+        {/* Nearby landmark distances */}
+        {property.nearbyPlaces?.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-charcoal/55">
+            {property.nearbyPlaces.slice(0, 2).map((n) => (
+              <span key={n.type + n.name} className="flex items-center gap-1">
+                <MapPin className="h-3 w-3 text-gold" />
+                {n.type} · {n.distance}
+              </span>
+            ))}
+          </div>
+        )}
+
         <Link
           to={`/property/${property.slug}`}
           className="mt-5 flex items-center justify-between rounded-xl bg-cloud px-4 py-3 text-sm font-medium text-charcoal transition hover:bg-charcoal hover:text-white"
