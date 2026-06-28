@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import { SavedProvider } from "./context/SavedContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { ToastProvider } from "./context/ToastContext.jsx";
 import RequireRole from "./components/admin/RequireRole.jsx";
 import { supabase, isSupabaseConfigured } from "./lib/supabase.js";
 
@@ -15,6 +16,7 @@ import AgentProfilePage from "./pages/AgentProfilePage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import BrochurePage from "./pages/BrochurePage.jsx";
+import WishlistPage from "./pages/WishlistPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
@@ -24,6 +26,7 @@ import AdminPropertyForm from "./pages/admin/AdminPropertyForm.jsx";
 import AdminAgents from "./pages/admin/AdminAgents.jsx";
 import AdminAgentForm from "./pages/admin/AdminAgentForm.jsx";
 import AdminMessages from "./pages/admin/AdminMessages.jsx";
+import AdminRequests from "./pages/admin/AdminRequests.jsx";
 
 import AgentLogin from "./pages/agent/AgentLogin.jsx";
 import AgentSignup from "./pages/agent/AgentSignup.jsx";
@@ -31,6 +34,7 @@ import AgentLayout from "./pages/agent/AgentLayout.jsx";
 import AgentDashboard from "./pages/agent/AgentDashboard.jsx";
 import AgentPropertyForm from "./pages/agent/AgentPropertyForm.jsx";
 import AgentProfileEdit from "./pages/agent/AgentProfileEdit.jsx";
+import AgentRequests from "./pages/agent/AgentRequests.jsx";
 
 import ForgotPassword from "./pages/auth/ForgotPassword.jsx";
 import ResetPassword from "./pages/auth/ResetPassword.jsx";
@@ -72,9 +76,10 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <SavedProvider>
-        <ScrollToTop />
-        <RecoveryRedirect />
+      <ToastProvider>
+        <SavedProvider>
+          <ScrollToTop />
+          <RecoveryRedirect />
         <div className="flex min-h-screen flex-col">
           {!isBare && <Navbar />}
           <main className="flex-1">
@@ -85,6 +90,7 @@ export default function App() {
               <Route path="/brochure/:slug" element={<BrochurePage />} />
               <Route path="/agents" element={<AgentsPage />} />
               <Route path="/agents/:slug" element={<AgentProfilePage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
 
@@ -109,6 +115,7 @@ export default function App() {
                 <Route path="agents" element={<AdminAgents />} />
                 <Route path="agents/new" element={<AdminAgentForm />} />
                 <Route path="agents/:id/edit" element={<AdminAgentForm />} />
+                <Route path="requests" element={<AdminRequests />} />
                 <Route path="messages" element={<AdminMessages />} />
               </Route>
 
@@ -126,6 +133,7 @@ export default function App() {
                 <Route index element={<AgentDashboard />} />
                 <Route path="new" element={<AgentPropertyForm />} />
                 <Route path="edit/:slug" element={<AgentPropertyForm />} />
+                <Route path="requests" element={<AgentRequests />} />
                 <Route path="profile" element={<AgentProfileEdit />} />
               </Route>
 
@@ -134,7 +142,8 @@ export default function App() {
           </main>
           {!isBare && <Footer />}
         </div>
-      </SavedProvider>
+        </SavedProvider>
+      </ToastProvider>
     </AuthProvider>
   );
 }

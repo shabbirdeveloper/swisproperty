@@ -1,11 +1,19 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, PlusCircle, UserCog, ExternalLink, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  PlusCircle,
+  Inbox,
+  UserCog,
+  ExternalLink,
+  LogOut,
+} from "lucide-react";
 import Logo from "../../components/Logo.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const links = [
   { to: "/agent", label: "My Listings", icon: LayoutDashboard, end: true },
   { to: "/agent/new", label: "Add Listing", icon: PlusCircle },
+  { to: "/agent/requests", label: "Requests", icon: Inbox },
   { to: "/agent/profile", label: "My Profile", icon: UserCog },
 ];
 

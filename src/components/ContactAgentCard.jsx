@@ -19,7 +19,11 @@ function InfoRow({ label, value }) {
   );
 }
 
-export default function ContactAgentCard({ property, onDownloadBrochure }) {
+export default function ContactAgentCard({
+  property,
+  onDownloadBrochure,
+  onRequestViewing,
+}) {
   const { agent } = property;
 
   return (
@@ -79,7 +83,7 @@ export default function ContactAgentCard({ property, onDownloadBrochure }) {
         </div>
 
         <div className="mt-5 space-y-3">
-          <button className="btn-primary w-full py-3.5">
+          <button onClick={onRequestViewing} className="btn-primary w-full py-3.5">
             <CalendarCheck className="h-4 w-4" />
             Request a Viewing
           </button>

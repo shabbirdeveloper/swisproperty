@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ChevronRight,
@@ -8,7 +9,9 @@ import {
   Download,
   Heart,
   Share2,
+  ShoppingBag,
 } from "lucide-react";
+import RequestModal from "../components/RequestModal.jsx";
 import PropertyGallery from "../components/PropertyGallery.jsx";
 import PropertyFeatureCards from "../components/PropertyFeatureCards.jsx";
 import PropertyTabs from "../components/PropertyTabs.jsx";
@@ -23,6 +26,13 @@ export default function PropertyDetailPage() {
   const { property, loading } = useProperty(slug);
   const { properties: allProperties } = useProperties();
   const { isSaved, toggleSaved } = useSaved();
+  const [requestOpen, setRequestOpen] = useState(false);
+  const [requestType, setRequestType] = useState("Buy");
+
+  const openRequest = (type) => {
+    setRequestType(type);
+    setRequestOpen(true);
+  };
 
   if (loading) {
     return (
@@ -131,7 +141,11 @@ export default function PropertyDetailPage() {
 
         {/* Action buttons */}
         <div className="mt-6 flex flex-wrap gap-3">
-          <a href={`tel:${property.agent.phone}`} className="btn-primary">
+          <button onClick={() => openRequest("Buy")} className="btn-primary">
+            <ShoppingBag className="h-4 w-4" />
+            Buy / Book / Sell
+          </button>
+          <a href={`tel:${property.agent.phone}`} className="btn-outline">
             <Phone className="h-4 w-4" />
             Contact Agent
           </a>
@@ -201,6 +215,7 @@ export default function PropertyDetailPage() {
             <ContactAgentCard
               property={property}
               onDownloadBrochure={handleDownloadBrochure}
+              onRequestViewing={() => openRequest("Booking")}
             />
           </div>
         </div>
@@ -217,6 +232,13 @@ export default function PropertyDetailPage() {
           </div>
         </div>
       </div>
+
+      <RequestModal
+        property={property}
+        open={requestOpen}
+        onClose={() => setRequestOpen(false)}
+        defaultType={requestType}
+      />
     </>
   );
 }

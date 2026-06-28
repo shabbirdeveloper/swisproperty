@@ -6,6 +6,7 @@ import {
   useCallback,
 } from "react";
 import { getSavedIds, addSaved, removeSaved } from "../services/saved.js";
+import { useToast } from "./ToastContext.jsx";
 
 /**
  * Saved/favorites store.
@@ -16,6 +17,7 @@ const SavedContext = createContext(null);
 
 export function SavedProvider({ children }) {
   const [saved, setSaved] = useState([]);
+  const toast = useToast();
 
   useEffect(() => {
     getSavedIds()
@@ -23,20 +25,28 @@ export function SavedProvider({ children }) {
       .catch(() => setSaved([]));
   }, []);
 
-  const toggleSaved = useCallback((id) => {
-    setSaved((prev) => {
-      const has = prev.includes(id);
-      // optimistic update
-      const next = has ? prev.filter((x) => x !== id) : [...prev, id];
-      (has ? removeSaved(id) : addSaved(id)).catch(() => {
-        // revert on failure
-        setSaved((cur) =>
-          has ? [...cur, id] : cur.filter((x) => x !== id)
-        );
+  const toggleSaved = useCallback(
+    (id) => {
+      setSaved((prev) => {
+        const has = prev.includes(id);
+        // optimistic update
+        const next = has ? prev.filter((x) => x !== id) : [...prev, id];
+        (has ? removeSaved(id) : addSaved(id))
+          .then(() =>
+            has
+              ? toast.info("Removed from wishlist")
+              : toast.success("Added to wishlist")
+          )
+          .catch(() => {
+            toast.error("Could not update wishlist");
+            // revert on failure
+            setSaved((cur) => (has ? [...cur, id] : cur.filter((x) => x !== id)));
+          });
+        return next;
       });
-      return next;
-    });
-  }, []);
+    },
+    [toast]
+  );
 
   const isSaved = useCallback((id) => saved.includes(id), [saved]);
 

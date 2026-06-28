@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   PlusCircle,
   Users,
+  Inbox,
   Mail,
   ExternalLink,
   LogOut,
@@ -14,6 +15,7 @@ const links = [
   { to: "/admin", label: "Listings", icon: LayoutDashboard, end: true },
   { to: "/admin/new", label: "Add Property", icon: PlusCircle },
   { to: "/admin/agents", label: "Agents", icon: Users },
+  { to: "/admin/requests", label: "Requests", icon: Inbox },
   { to: "/admin/messages", label: "Enquiries", icon: Mail },
 ];
 

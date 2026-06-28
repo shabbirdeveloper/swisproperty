@@ -19,9 +19,10 @@ import { useAuth } from "../context/AuthContext.jsx";
 const navLinks = [
   { to: "/", label: "Home", end: true },
   { to: "/listings", label: "Listings" },
-  { to: "/listings?status=For+Sale", label: "Buy" },
+  { to: "/listings?status=For+Sale", label: "Buy & Sell" },
   { to: "/listings?status=For+Rent", label: "Rent" },
   { to: "/agents", label: "Agents" },
+  { to: "/wishlist", label: "Wishlist" },
   { to: "/about", label: "About Us" },
   { to: "/contact", label: "Contact" },
 ];
@@ -86,9 +87,9 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
-            to="/listings?saved=1"
+            to="/wishlist"
             className="relative flex h-11 w-11 items-center justify-center rounded-full border border-charcoal/10 text-charcoal transition hover:border-gold hover:text-gold"
-            aria-label="Saved properties"
+            aria-label="Wishlist"
           >
             <Heart className="h-5 w-5" />
             {count > 0 && (
