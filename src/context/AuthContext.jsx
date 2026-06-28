@@ -91,6 +91,34 @@ export function AuthProvider({ children }) {
       },
     });
     if (error) throw error;
+
+    // Safety net: create the profile + agent record from the app, so the agent
+    // always shows up for admin approval even if the DB trigger isn't present.
+    // (Requires a session, i.e. "Confirm email" turned off in Supabase.)
+    if (data.user && data.session) {
+      try {
+        await supabase
+          .from("profiles")
+          .upsert({ id: data.user.id, role: "agent" }, {
+            onConflict: "id",
+            ignoreDuplicates: true,
+          });
+        await supabase.from("agents").upsert(
+          {
+            user_id: data.user.id,
+            name,
+            designation,
+            email,
+            phone,
+            whatsapp,
+            approved: false,
+          },
+          { onConflict: "email", ignoreDuplicates: true }
+        );
+      } catch {
+        /* the DB trigger / backfill will cover it */
+      }
+    }
     return data;
   };
 
