@@ -10,11 +10,24 @@ import {
   UserPlus,
   UserCog,
   ShieldCheck,
+  MessageSquare,
   LayoutDashboard,
 } from "lucide-react";
 import Logo from "./Logo.jsx";
 import { useSaved } from "../context/SavedContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+
+function MenuLink({ to, icon: Icon, children }) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal/80 transition hover:bg-cloud hover:text-gold"
+    >
+      <Icon className="h-4 w-4 text-gold" />
+      {children}
+    </Link>
+  );
+}
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -120,21 +133,22 @@ export default function Navbar() {
                 <div className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-charcoal/[0.06] bg-white py-1.5 shadow-lift">
                   {user ? (
                     <>
-                      <Link
-                        to={role === "admin" ? "/admin" : "/agent"}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal/80 transition hover:bg-cloud hover:text-gold"
-                      >
-                        <LayoutDashboard className="h-4 w-4 text-gold" />
-                        {role === "admin" ? "Admin Dashboard" : "Agent Dashboard"}
-                      </Link>
+                      {role === "customer" && (
+                        <>
+                          <MenuLink to="/account" icon={UserCog}>My Account</MenuLink>
+                          <MenuLink to="/account/wishlist" icon={Heart}>Wishlist</MenuLink>
+                          <MenuLink to="/account/messages" icon={MessageSquare}>Messages</MenuLink>
+                        </>
+                      )}
                       {role === "agent" && (
-                        <Link
-                          to="/agent/profile"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal/80 transition hover:bg-cloud hover:text-gold"
-                        >
-                          <UserCog className="h-4 w-4 text-gold" />
-                          My Profile
-                        </Link>
+                        <>
+                          <MenuLink to="/agent" icon={LayoutDashboard}>Agent Dashboard</MenuLink>
+                          <MenuLink to="/agent/messages" icon={MessageSquare}>Messages</MenuLink>
+                          <MenuLink to="/agent/profile" icon={UserCog}>My Profile</MenuLink>
+                        </>
+                      )}
+                      {role === "admin" && (
+                        <MenuLink to="/admin" icon={LayoutDashboard}>Admin Dashboard</MenuLink>
                       )}
                       <button
                         onClick={handleSignOut}
@@ -146,28 +160,11 @@ export default function Navbar() {
                     </>
                   ) : (
                     <>
-                      <Link
-                        to="/agent/login"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal/80 transition hover:bg-cloud hover:text-gold"
-                      >
-                        <LogIn className="h-4 w-4 text-gold" />
-                        Agent Sign In
-                      </Link>
-                      <Link
-                        to="/agent/signup"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal/80 transition hover:bg-cloud hover:text-gold"
-                      >
-                        <UserPlus className="h-4 w-4 text-gold" />
-                        Register as Agent
-                      </Link>
+                      <MenuLink to="/customer/login" icon={LogIn}>Sign In</MenuLink>
+                      <MenuLink to="/customer/signup" icon={UserPlus}>Create Account</MenuLink>
                       <div className="my-1 border-t border-charcoal/[0.06]" />
-                      <Link
-                        to="/admin/login"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal/60 transition hover:bg-cloud hover:text-gold"
-                      >
-                        <ShieldCheck className="h-4 w-4 text-charcoal/40" />
-                        Admin Login
-                      </Link>
+                      <MenuLink to="/agent/login" icon={User}>Agent Portal</MenuLink>
+                      <MenuLink to="/admin/login" icon={ShieldCheck}>Admin</MenuLink>
                     </>
                   )}
                 </div>
@@ -200,51 +197,43 @@ export default function Navbar() {
               </li>
             ))}
             <li className="mt-2 border-t border-charcoal/[0.06] pt-3">
-              {user ? (
-                <>
-                  <Link
-                    to={role === "admin" ? "/admin" : "/agent"}
-                    className="block rounded-lg px-2 py-3 text-base font-medium text-charcoal/80 transition hover:bg-cloud hover:text-gold"
-                  >
-                    {role === "admin" ? "Admin Dashboard" : "Agent Dashboard"}
-                  </Link>
-                  {role === "agent" && (
-                    <Link
-                      to="/agent/profile"
-                      className="block rounded-lg px-2 py-3 text-base font-medium text-charcoal/80 transition hover:bg-cloud hover:text-gold"
-                    >
-                      My Profile
-                    </Link>
-                  )}
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full rounded-lg px-2 py-3 text-left text-base font-medium text-charcoal/80 transition hover:bg-cloud hover:text-red-600"
-                  >
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/agent/login"
-                    className="block rounded-lg px-2 py-3 text-base font-medium text-charcoal/80 transition hover:bg-cloud hover:text-gold"
-                  >
-                    Agent Sign In
-                  </Link>
-                  <Link
-                    to="/agent/signup"
-                    className="block rounded-lg px-2 py-3 text-base font-medium text-charcoal/80 transition hover:bg-cloud hover:text-gold"
-                  >
-                    Register as Agent
-                  </Link>
-                  <Link
-                    to="/admin/login"
-                    className="block rounded-lg px-2 py-3 text-base font-medium text-charcoal/50 transition hover:bg-cloud hover:text-gold"
-                  >
-                    Admin Login
-                  </Link>
-                </>
-              )}
+              {(() => {
+                const cls =
+                  "block rounded-lg px-2 py-3 text-base font-medium text-charcoal/80 transition hover:bg-cloud hover:text-gold";
+                if (user && role === "customer")
+                  return (
+                    <>
+                      <Link to="/account" className={cls}>My Account</Link>
+                      <Link to="/account/wishlist" className={cls}>Wishlist</Link>
+                      <Link to="/account/messages" className={cls}>Messages</Link>
+                      <button onClick={handleSignOut} className={`${cls} w-full text-left hover:text-red-600`}>Sign Out</button>
+                    </>
+                  );
+                if (user && role === "agent")
+                  return (
+                    <>
+                      <Link to="/agent" className={cls}>Agent Dashboard</Link>
+                      <Link to="/agent/messages" className={cls}>Messages</Link>
+                      <Link to="/agent/profile" className={cls}>My Profile</Link>
+                      <button onClick={handleSignOut} className={`${cls} w-full text-left hover:text-red-600`}>Sign Out</button>
+                    </>
+                  );
+                if (user && role === "admin")
+                  return (
+                    <>
+                      <Link to="/admin" className={cls}>Admin Dashboard</Link>
+                      <button onClick={handleSignOut} className={`${cls} w-full text-left hover:text-red-600`}>Sign Out</button>
+                    </>
+                  );
+                return (
+                  <>
+                    <Link to="/customer/login" className={cls}>Sign In</Link>
+                    <Link to="/customer/signup" className={cls}>Create Account</Link>
+                    <Link to="/agent/login" className={cls}>Agent Portal</Link>
+                    <Link to="/admin/login" className={cls}>Admin</Link>
+                  </>
+                );
+              })()}
             </li>
           </ul>
         </div>

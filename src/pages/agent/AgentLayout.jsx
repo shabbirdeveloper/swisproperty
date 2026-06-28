@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   PlusCircle,
   Inbox,
+  MessageSquare,
   UserCog,
   ExternalLink,
   LogOut,
@@ -14,6 +15,7 @@ const links = [
   { to: "/agent", label: "My Listings", icon: LayoutDashboard, end: true },
   { to: "/agent/new", label: "Add Listing", icon: PlusCircle },
   { to: "/agent/requests", label: "Requests", icon: Inbox },
+  { to: "/agent/messages", label: "Messages", icon: MessageSquare },
   { to: "/agent/profile", label: "My Profile", icon: UserCog },
 ];
 

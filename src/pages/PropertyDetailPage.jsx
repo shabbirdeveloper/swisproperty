@@ -11,7 +11,9 @@ import {
   Share2,
   ShoppingBag,
 } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import RequestModal from "../components/RequestModal.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import PropertyGallery from "../components/PropertyGallery.jsx";
 import PropertyFeatureCards from "../components/PropertyFeatureCards.jsx";
 import PropertyTabs from "../components/PropertyTabs.jsx";
@@ -26,12 +28,26 @@ export default function PropertyDetailPage() {
   const { property, loading } = useProperty(slug);
   const { properties: allProperties } = useProperties();
   const { isSaved, toggleSaved } = useSaved();
+  const { role } = useAuth();
   const [requestOpen, setRequestOpen] = useState(false);
   const [requestType, setRequestType] = useState("Buy");
 
   const openRequest = (type) => {
     setRequestType(type);
     setRequestOpen(true);
+  };
+
+  const messageAgent = () => {
+    if (!property?.agentUserId) return;
+    if (role === "customer") {
+      navigate(
+        `/account/messages?to=${property.agentUserId}&name=${encodeURIComponent(
+          property.agent.name
+        )}`
+      );
+    } else {
+      navigate("/customer/login");
+    }
   };
 
   if (loading) {
@@ -158,6 +174,12 @@ export default function PropertyDetailPage() {
             <MessageCircle className="h-4 w-4" />
             WhatsApp
           </a>
+          {property.agentUserId && (
+            <button onClick={messageAgent} className="btn-outline">
+              <MessageSquare className="h-4 w-4" />
+              Message Agent
+            </button>
+          )}
           <button onClick={handleDownloadBrochure} className="btn-outline">
             <Download className="h-4 w-4" />
             Download Brochure

@@ -13,22 +13,29 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [agent, setAgent] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const loadRole = useCallback(async (sessionUser) => {
     if (!sessionUser) {
       setRole(null);
       setAgent(null);
+      setProfile(null);
       return;
     }
-    // role from profiles
-    const { data: profile } = await supabase
+    // role + display info from profiles
+    const { data: prof } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, full_name, avatar")
       .eq("id", sessionUser.id)
       .maybeSingle();
-    const r = profile?.role || "agent";
+    const r = prof?.role || "agent";
     setRole(r);
+    setProfile(
+      prof
+        ? { fullName: prof.full_name || "", avatar: prof.avatar || "" }
+        : { fullName: "", avatar: "" }
+    );
 
     if (r === "agent") {
       const { data: agentRow } = await supabase
@@ -138,6 +145,40 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   };
 
+  const signUpCustomer = async ({ email, password, fullName }) => {
+    if (!isSupabaseConfigured)
+      throw new Error("Supabase is not configured. Add keys to .env.");
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { role: "customer", name: fullName } },
+    });
+    if (error) throw error;
+    if (data.user && data.session) {
+      try {
+        await supabase
+          .from("profiles")
+          .upsert(
+            { id: data.user.id, role: "customer", full_name: fullName },
+            { onConflict: "id" }
+          );
+      } catch {
+        /* trigger covers profile creation */
+      }
+    }
+    return data;
+  };
+
+  const updateMyProfile = async ({ fullName, avatar }) => {
+    if (!isSupabaseConfigured || !user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: fullName, avatar })
+      .eq("id", user.id);
+    if (error) throw error;
+    setProfile({ fullName, avatar });
+  };
+
   const refreshAgent = useCallback(async () => {
     if (user) await loadRole(user);
   }, [user, loadRole]);
@@ -155,15 +196,19 @@ export function AuthProvider({ children }) {
         user,
         role,
         agent,
+        profile,
         loading,
         signIn,
         signUpAgent,
+        signUpCustomer,
+        updateMyProfile,
         signOut,
         refreshAgent,
         resetPassword,
         updatePassword,
         isAdmin: role === "admin",
         isAgent: role === "agent",
+        isCustomer: role === "customer",
         isConfigured: isSupabaseConfigured,
       }}
     >

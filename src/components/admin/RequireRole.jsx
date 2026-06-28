@@ -18,13 +18,23 @@ export default function RequireRole({ role, children }) {
     );
   }
 
+  const homeFor = (r) =>
+    r === "admin" ? "/admin" : r === "agent" ? "/agent" : "/account";
+  const loginFor = (r) =>
+    r === "admin"
+      ? "/admin/login"
+      : r === "agent"
+      ? "/agent/login"
+      : "/customer/login";
+
   if (!user) {
-    const loginPath = role === "admin" ? "/admin/login" : "/agent/login";
-    return <Navigate to={loginPath} state={{ from: location }} replace />;
+    return (
+      <Navigate to={loginFor(role)} state={{ from: location }} replace />
+    );
   }
 
   if (role && userRole !== role) {
-    return <Navigate to={userRole === "admin" ? "/admin" : "/agent"} replace />;
+    return <Navigate to={homeFor(userRole)} replace />;
   }
 
   return children;

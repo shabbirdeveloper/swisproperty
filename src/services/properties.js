@@ -65,6 +65,7 @@ function normalize(row) {
       name: n.name,
       distance: n.distance,
     })),
+    agentUserId: a.user_id || null,
     agent: {
       name: a.name || "SwissProperty Advisor",
       designation: a.designation || "Property Advisor",

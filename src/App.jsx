@@ -35,6 +35,16 @@ import AgentDashboard from "./pages/agent/AgentDashboard.jsx";
 import AgentPropertyForm from "./pages/agent/AgentPropertyForm.jsx";
 import AgentProfileEdit from "./pages/agent/AgentProfileEdit.jsx";
 import AgentRequests from "./pages/agent/AgentRequests.jsx";
+import AgentMessages from "./pages/agent/AgentMessages.jsx";
+
+import CustomerLogin from "./pages/customer/CustomerLogin.jsx";
+import CustomerSignup from "./pages/customer/CustomerSignup.jsx";
+import CustomerLayout from "./pages/customer/CustomerLayout.jsx";
+import CustomerProfile from "./pages/customer/CustomerProfile.jsx";
+import CustomerWishlist from "./pages/customer/CustomerWishlist.jsx";
+import CustomerMessages from "./pages/customer/CustomerMessages.jsx";
+
+import AdminInbox from "./pages/admin/AdminInbox.jsx";
 
 import ForgotPassword from "./pages/auth/ForgotPassword.jsx";
 import ResetPassword from "./pages/auth/ResetPassword.jsx";
@@ -71,6 +81,9 @@ export default function App() {
     pathname.startsWith("/admin") ||
     pathname === "/agent" ||
     pathname.startsWith("/agent/") ||
+    pathname === "/account" ||
+    pathname.startsWith("/account/") ||
+    pathname.startsWith("/customer/") ||
     pathname === "/forgot-password" ||
     pathname === "/reset-password";
 
@@ -94,9 +107,25 @@ export default function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
 
-              {/* Password reset (shared by admin + agent) */}
+              {/* Password reset (shared) */}
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+
+              {/* Customer portal */}
+              <Route path="/customer/login" element={<CustomerLogin />} />
+              <Route path="/customer/signup" element={<CustomerSignup />} />
+              <Route
+                path="/account"
+                element={
+                  <RequireRole role="customer">
+                    <CustomerLayout />
+                  </RequireRole>
+                }
+              >
+                <Route index element={<CustomerProfile />} />
+                <Route path="wishlist" element={<CustomerWishlist />} />
+                <Route path="messages" element={<CustomerMessages />} />
+              </Route>
 
 
               {/* Admin portal */}
@@ -116,6 +145,7 @@ export default function App() {
                 <Route path="agents/new" element={<AdminAgentForm />} />
                 <Route path="agents/:id/edit" element={<AdminAgentForm />} />
                 <Route path="requests" element={<AdminRequests />} />
+                <Route path="inbox" element={<AdminInbox />} />
                 <Route path="messages" element={<AdminMessages />} />
               </Route>
 
@@ -134,6 +164,7 @@ export default function App() {
                 <Route path="new" element={<AgentPropertyForm />} />
                 <Route path="edit/:slug" element={<AgentPropertyForm />} />
                 <Route path="requests" element={<AgentRequests />} />
+                <Route path="messages" element={<AgentMessages />} />
                 <Route path="profile" element={<AgentProfileEdit />} />
               </Route>
 

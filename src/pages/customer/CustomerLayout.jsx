@@ -1,41 +1,31 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard,
-  PlusCircle,
-  Users,
-  Inbox,
-  MessageSquare,
-  Mail,
-  ExternalLink,
-  LogOut,
-} from "lucide-react";
+import { UserCog, Heart, MessageSquare, ExternalLink, LogOut } from "lucide-react";
 import Logo from "../../components/Logo.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const links = [
-  { to: "/admin", label: "Listings", icon: LayoutDashboard, end: true },
-  { to: "/admin/new", label: "Add Property", icon: PlusCircle },
-  { to: "/admin/agents", label: "Agents", icon: Users },
-  { to: "/admin/requests", label: "Requests", icon: Inbox },
-  { to: "/admin/inbox", label: "Messages", icon: MessageSquare },
-  { to: "/admin/messages", label: "Enquiries", icon: Mail },
+  { to: "/account", label: "My Profile", icon: UserCog, end: true },
+  { to: "/account/wishlist", label: "Wishlist", icon: Heart },
+  { to: "/account/messages", label: "Messages", icon: MessageSquare },
 ];
 
-export default function AdminLayout() {
-  const { signOut, user } = useAuth();
+export default function CustomerLayout() {
+  const { signOut, profile, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/admin/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   return (
     <div className="flex min-h-screen flex-col bg-cloud lg:flex-row">
-      {/* Sidebar */}
       <aside className="flex shrink-0 flex-col border-b border-charcoal/[0.06] bg-white lg:w-64 lg:border-b-0 lg:border-r">
         <div className="border-b border-charcoal/[0.06] p-5">
           <Logo />
+          <span className="mt-2 inline-block rounded-full bg-gold/10 px-2.5 py-0.5 text-[11px] font-semibold text-gold">
+            My Account
+          </span>
         </div>
         <nav className="flex flex-1 flex-row gap-1 overflow-x-auto p-3 lg:flex-col">
           {links.map(({ to, label, icon: Icon, end }) => (
@@ -74,11 +64,13 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* Content */}
       <main className="flex-1 p-5 sm:p-8">
-        {user?.email && (
+        {(profile?.fullName || user?.email) && (
           <p className="mb-6 text-sm text-charcoal/50">
-            Signed in as <span className="font-medium text-charcoal">{user.email}</span>
+            Signed in as{" "}
+            <span className="font-medium text-charcoal">
+              {profile?.fullName || user?.email}
+            </span>
           </p>
         )}
         <Outlet />
