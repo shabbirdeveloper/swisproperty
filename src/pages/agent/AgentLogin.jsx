@@ -86,12 +86,25 @@ export default function AgentLogin() {
             </button>
           </form>
 
-          <p className="mt-5 text-center text-sm text-charcoal/55">
-            New agent?{" "}
-            <Link to="/agent/signup" className="font-semibold text-gold hover:underline">
-              Create an account
-            </Link>
-          </p>
+          <div className="mt-5 space-y-2 text-center text-sm text-charcoal/55">
+            <p>
+              <Link
+                to="/forgot-password"
+                className="font-medium text-charcoal/60 hover:text-gold"
+              >
+                Forgot password?
+              </Link>
+            </p>
+            <p>
+              New agent?{" "}
+              <Link
+                to="/agent/signup"
+                className="font-semibold text-gold hover:underline"
+              >
+                Create an account
+              </Link>
+            </p>
+          </div>
         </div>
         <p className="mt-6 text-center text-sm text-charcoal/50">
           <Link to="/" className="transition hover:text-gold">

@@ -31,6 +31,9 @@ import AgentDashboard from "./pages/agent/AgentDashboard.jsx";
 import AgentPropertyForm from "./pages/agent/AgentPropertyForm.jsx";
 import AgentProfileEdit from "./pages/agent/AgentProfileEdit.jsx";
 
+import ForgotPassword from "./pages/auth/ForgotPassword.jsx";
+import ResetPassword from "./pages/auth/ResetPassword.jsx";
+
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -46,7 +49,9 @@ export default function App() {
     pathname.startsWith("/brochure") ||
     pathname.startsWith("/admin") ||
     pathname === "/agent" ||
-    pathname.startsWith("/agent/");
+    pathname.startsWith("/agent/") ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password";
 
   return (
     <AuthProvider>
@@ -64,6 +69,11 @@ export default function App() {
               <Route path="/agents/:slug" element={<AgentProfilePage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
+
+              {/* Password reset (shared by admin + agent) */}
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+
 
               {/* Admin portal */}
               <Route path="/admin/login" element={<AdminLogin />} />

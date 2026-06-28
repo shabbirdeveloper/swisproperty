@@ -97,6 +97,15 @@ export default function AdminLogin() {
               {busy ? "Signing in…" : "Sign In"}
             </button>
           </form>
+
+          <p className="mt-5 text-center text-sm">
+            <Link
+              to="/forgot-password"
+              className="font-medium text-charcoal/60 hover:text-gold"
+            >
+              Forgot password?
+            </Link>
+          </p>
         </div>
         <p className="mt-6 text-center text-sm text-charcoal/50">
           <Link to="/" className="transition hover:text-gold">

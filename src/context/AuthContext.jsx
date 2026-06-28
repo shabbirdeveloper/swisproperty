@@ -94,6 +94,22 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const resetPassword = async (email) => {
+    if (!isSupabaseConfigured)
+      throw new Error("Supabase is not configured. Add keys to .env.");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) throw error;
+  };
+
+  const updatePassword = async (newPassword) => {
+    if (!isSupabaseConfigured)
+      throw new Error("Supabase is not configured. Add keys to .env.");
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+  };
+
   const refreshAgent = useCallback(async () => {
     if (user) await loadRole(user);
   }, [user, loadRole]);
@@ -116,6 +132,8 @@ export function AuthProvider({ children }) {
         signUpAgent,
         signOut,
         refreshAgent,
+        resetPassword,
+        updatePassword,
         isAdmin: role === "admin",
         isAgent: role === "agent",
         isConfigured: isSupabaseConfigured,
