@@ -19,9 +19,31 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import CallModal from "./CallModal.jsx";
 
+// Short notification beep (no audio file needed).
+function playBeep() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = "sine";
+    o.frequency.value = 880;
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.28);
+    o.start();
+    o.stop(ctx.currentTime + 0.3);
+    o.onended = () => ctx.close();
+  } catch {
+    /* ignore */
+  }
+}
+
 /**
- * Reusable chat. Used by customers, agents and admins.
- * Open a specific conversation via ?to=<userId>&name=<name>.
+ * Reusable chat. Open a specific conversation via ?to=<userId>&name=<name>.
  */
 export default function Messenger() {
   const { user, profile } = useAuth();
@@ -36,6 +58,7 @@ export default function Messenger() {
   const [sending, setSending] = useState(false);
   const [callOpen, setCallOpen] = useState(false);
   const bottomRef = useRef(null);
+  const prevLenRef = useRef(0);
 
   const loadConversations = useCallback(() => {
     getConversations()
@@ -45,13 +68,26 @@ export default function Messenger() {
 
   useEffect(loadConversations, [loadConversations]);
 
-  // Load + poll the active thread
+  // Load + poll the active thread, with sound/alert on new incoming messages
   useEffect(() => {
     if (!activeId) return;
     let active = true;
+    prevLenRef.current = 0; // reset baseline for the new conversation
     const load = () =>
       getThread(activeId)
-        .then((m) => active && setMessages(m))
+        .then((m) => {
+          if (!active) return;
+          if (prevLenRef.current !== 0 && m.length > prevLenRef.current) {
+            const last = m[m.length - 1];
+            if (last && !last.mine) {
+              playBeep();
+              toast.info("New message");
+              markThreadRead(activeId).then(loadConversations);
+            }
+          }
+          prevLenRef.current = m.length;
+          setMessages(m);
+        })
         .catch(() => {});
     load();
     markThreadRead(activeId).then(loadConversations);
@@ -60,7 +96,7 @@ export default function Messenger() {
       active = false;
       clearInterval(t);
     };
-  }, [activeId, loadConversations]);
+  }, [activeId, loadConversations, toast]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -78,6 +114,7 @@ export default function Messenger() {
     try {
       const msg = await sendMessage({ receiverId: activeId, body, imageUrl });
       setMessages((m) => [...m, msg]);
+      prevLenRef.current += 1;
       setText("");
       loadConversations();
     } catch (e) {
@@ -106,19 +143,19 @@ export default function Messenger() {
   const headerName = activeConv?.name || activeName || "Conversation";
 
   return (
-    <div className="grid h-[72vh] grid-cols-1 overflow-hidden rounded-2xl border border-charcoal/[0.06] bg-white md:grid-cols-[300px_1fr]">
+    <div className="flex h-[72vh] overflow-hidden rounded-2xl border border-charcoal/[0.06] bg-white">
       {/* Conversation list */}
       <div
-        className={`border-r border-charcoal/[0.06] ${
-          activeId ? "hidden md:block" : "block"
+        className={`w-full shrink-0 flex-col border-r border-charcoal/[0.06] md:flex md:w-[300px] ${
+          activeId ? "hidden" : "flex"
         }`}
       >
-        <div className="border-b border-charcoal/[0.06] px-4 py-3">
+        <div className="shrink-0 border-b border-charcoal/[0.06] px-4 py-3">
           <h2 className="font-serif text-lg font-semibold text-charcoal">
             Messages
           </h2>
         </div>
-        <div className="overflow-y-auto" style={{ maxHeight: "calc(72vh - 53px)" }}>
+        <div className="min-h-0 flex-1 overflow-y-auto">
           {conversations.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-charcoal/50">
               No conversations yet.
@@ -161,7 +198,11 @@ export default function Messenger() {
       </div>
 
       {/* Thread */}
-      <div className={`flex flex-col ${activeId ? "flex" : "hidden md:flex"}`}>
+      <div
+        className={`min-w-0 flex-1 flex-col ${
+          activeId ? "flex" : "hidden md:flex"
+        }`}
+      >
         {!activeId ? (
           <div className="flex flex-1 flex-col items-center justify-center text-charcoal/40">
             <MessageSquare className="h-10 w-10" />
@@ -169,7 +210,7 @@ export default function Messenger() {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between border-b border-charcoal/[0.06] px-4 py-3">
+            <div className="flex shrink-0 items-center justify-between border-b border-charcoal/[0.06] px-4 py-3">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
@@ -192,14 +233,15 @@ export default function Messenger() {
               </button>
             </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto bg-cloud px-4 py-4">
+            {/* Scrollable message list */}
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-cloud px-4 py-4">
               {messages.map((m) => (
                 <div
                   key={m.id}
                   className={`flex ${m.mine ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${
+                    className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${
                       m.mine
                         ? "bg-charcoal text-white"
                         : "bg-white text-charcoal shadow-soft"
@@ -212,7 +254,7 @@ export default function Messenger() {
                         className="mb-1 max-h-60 rounded-lg object-cover"
                       />
                     )}
-                    {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
+                    {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
                     <span
                       className={`mt-1 block text-[10px] ${
                         m.mine ? "text-white/50" : "text-charcoal/40"
@@ -231,7 +273,7 @@ export default function Messenger() {
 
             <form
               onSubmit={onSubmit}
-              className="flex items-center gap-2 border-t border-charcoal/[0.06] px-3 py-3"
+              className="flex shrink-0 items-center gap-2 border-t border-charcoal/[0.06] px-3 py-3"
             >
               <label className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-charcoal/10 text-charcoal transition hover:border-gold hover:text-gold">
                 <ImagePlus className="h-5 w-5" />
