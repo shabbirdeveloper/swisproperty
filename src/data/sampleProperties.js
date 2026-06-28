@@ -42,6 +42,7 @@ export const propertyTypes = [
 export const locations = [
   "Promenade",
   "Congress Centre",
+  "Geneva",
   "Zurich Region",
   "Lake Geneva Region",
   "Lucerne–Lake Lucerne",
@@ -178,8 +179,8 @@ export const sampleProperties = [
       "Modern Kitchen",
     ],
     nearbyPlaces: [
-      { type: "City Center", name: "Bahnhofstrasse", distance: "0.4 km" },
-      { type: "School", name: "Zurich International School", distance: "1.2 km" },
+      { type: "Congress Centre", name: "Zurich Kongresshaus", distance: "1.4 km" },
+      { type: "Promenade", name: "Lake Zurich Promenade", distance: "0.6 km" },
       { type: "Hospital", name: "University Hospital Zurich", distance: "1.8 km" },
       { type: "Shopping Mall", name: "Globus Department Store", distance: "0.6 km" },
       { type: "Public Transport", name: "Zurich HB Station", distance: "0.5 km" },
@@ -235,8 +236,8 @@ export const sampleProperties = [
       "Modern Kitchen",
     ],
     nearbyPlaces: [
-      { type: "City Center", name: "Geneva Old Town", distance: "3.5 km" },
-      { type: "School", name: "Institut Florimont", distance: "2.1 km" },
+      { type: "Congress Centre", name: "Palexpo Geneva", distance: "3.5 km" },
+      { type: "Promenade", name: "Lake Geneva Promenade", distance: "2.0 km" },
       { type: "Hospital", name: "Hôpitaux Universitaires", distance: "4.0 km" },
       { type: "Shopping Mall", name: "Balexert Centre", distance: "5.5 km" },
       { type: "Public Transport", name: "Cologny Bus Stop", distance: "0.3 km" },
@@ -292,8 +293,8 @@ export const sampleProperties = [
       "Mountain View",
     ],
     nearbyPlaces: [
-      { type: "City Center", name: "Piazza della Riforma", distance: "1.0 km" },
-      { type: "School", name: "TASIS American School", distance: "3.2 km" },
+      { type: "Congress Centre", name: "Palazzo dei Congressi", distance: "1.5 km" },
+      { type: "Promenade", name: "Lugano Lakefront Promenade", distance: "0.3 km" },
       { type: "Hospital", name: "Ospedale Regionale", distance: "2.4 km" },
       { type: "Shopping Mall", name: "Lugano Centro", distance: "1.1 km" },
       { type: "Public Transport", name: "Lugano Station", distance: "1.5 km" },
@@ -349,8 +350,8 @@ export const sampleProperties = [
       "Modern Kitchen",
     ],
     nearbyPlaces: [
-      { type: "City Center", name: "Zermatt Village", distance: "0.8 km" },
-      { type: "School", name: "Zermatt Primary School", distance: "1.0 km" },
+      { type: "Congress Centre", name: "Zermatt Forum", distance: "1.2 km" },
+      { type: "Promenade", name: "Bahnhofstrasse Promenade", distance: "0.7 km" },
       { type: "Hospital", name: "Zermatt Medical Center", distance: "1.2 km" },
       { type: "Shopping Mall", name: "Bahnhofstrasse Shops", distance: "0.7 km" },
       { type: "Public Transport", name: "Gornergrat Railway", distance: "0.9 km" },
@@ -404,8 +405,8 @@ export const sampleProperties = [
       "Modern Kitchen",
     ],
     nearbyPlaces: [
-      { type: "City Center", name: "Marktplatz Basel", distance: "0.6 km" },
-      { type: "School", name: "University of Basel", distance: "0.9 km" },
+      { type: "Congress Centre", name: "Congress Center Basel", distance: "1.1 km" },
+      { type: "Promenade", name: "Rhine Promenade", distance: "0.5 km" },
       { type: "Hospital", name: "Universitätsspital Basel", distance: "1.3 km" },
       { type: "Shopping Mall", name: "Stücki Park", distance: "3.0 km" },
       { type: "Public Transport", name: "Basel SBB Station", distance: "1.0 km" },
@@ -462,8 +463,8 @@ export const sampleProperties = [
       "Modern Kitchen",
     ],
     nearbyPlaces: [
-      { type: "City Center", name: "Place St-François", distance: "2.2 km" },
-      { type: "School", name: "École Internationale", distance: "1.8 km" },
+      { type: "Congress Centre", name: "Beaulieu Lausanne", distance: "2.4 km" },
+      { type: "Promenade", name: "Ouchy Lakeside Promenade", distance: "1.0 km" },
       { type: "Hospital", name: "CHUV Lausanne", distance: "3.1 km" },
       { type: "Shopping Mall", name: "Centre Métropole", distance: "2.0 km" },
       { type: "Public Transport", name: "Ouchy Metro M2", distance: "0.5 km" },

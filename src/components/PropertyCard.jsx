@@ -95,10 +95,6 @@ export default function PropertyCard({ property }) {
         {/* Secondary specs */}
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-charcoal/55">
           <span className="flex items-center gap-1.5">
-            <Navigation className="h-3.5 w-3.5 text-gold" />
-            {property.distanceFromCityCenter} to centre
-          </span>
-          <span className="flex items-center gap-1.5">
             <Car className="h-3.5 w-3.5 text-gold" />
             {property.parking}
           </span>
@@ -108,17 +104,24 @@ export default function PropertyCard({ property }) {
           </span>
         </div>
 
-        {/* Nearby landmark distances */}
-        {property.nearbyPlaces?.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-charcoal/55">
-            {property.nearbyPlaces.slice(0, 2).map((n) => (
-              <span key={n.type + n.name} className="flex items-center gap-1">
-                <MapPin className="h-3 w-3 text-gold" />
-                {n.type} · {n.distance}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Landmark distances (excludes city centre & school) */}
+        {(() => {
+          const hide = ["City Center", "City Centre", "School"];
+          const landmarks = (property.nearbyPlaces || []).filter(
+            (n) => !hide.includes(n.type)
+          );
+          if (!landmarks.length) return null;
+          return (
+            <div className="mt-2 flex flex-col gap-1 text-xs text-charcoal/60">
+              {landmarks.slice(0, 2).map((n) => (
+                <span key={n.type + n.name} className="flex items-center gap-1.5">
+                  <Navigation className="h-3 w-3 text-gold" />
+                  {n.distance} to {n.type}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
 
         <Link
           to={`/property/${property.slug}`}
