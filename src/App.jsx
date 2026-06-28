@@ -1,10 +1,11 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import { SavedProvider } from "./context/SavedContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import RequireRole from "./components/admin/RequireRole.jsx";
+import { supabase, isSupabaseConfigured } from "./lib/supabase.js";
 
 import HomePage from "./pages/HomePage.jsx";
 import ListingsPage from "./pages/ListingsPage.jsx";
@@ -42,6 +43,22 @@ function ScrollToTop() {
   return null;
 }
 
+// Whenever Supabase detects a password-recovery link (wherever it lands),
+// send the user straight to the set-new-password screen.
+function RecoveryRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    const hash = window.location.hash || "";
+    if (hash.includes("type=recovery")) navigate("/reset-password");
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") navigate("/reset-password");
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
+  return null;
+}
+
 export default function App() {
   const { pathname } = useLocation();
   // Portal/print pages render without the public navbar + footer.
@@ -57,6 +74,7 @@ export default function App() {
     <AuthProvider>
       <SavedProvider>
         <ScrollToTop />
+        <RecoveryRedirect />
         <div className="flex min-h-screen flex-col">
           {!isBare && <Navbar />}
           <main className="flex-1">
