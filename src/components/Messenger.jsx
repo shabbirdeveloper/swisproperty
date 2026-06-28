@@ -6,6 +6,8 @@ import {
   Phone,
   ArrowLeft,
   MessageSquare,
+  Check,
+  CheckCheck,
 } from "lucide-react";
 import {
   getConversations,
@@ -255,14 +257,20 @@ export default function Messenger() {
                     )}
                     {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
                     <span
-                      className={`mt-1 block text-[10px] ${
-                        m.mine ? "text-white/50" : "text-charcoal/40"
+                      className={`mt-1 flex items-center gap-1 text-[10px] ${
+                        m.mine ? "justify-end text-white/50" : "text-charcoal/40"
                       }`}
                     >
                       {new Date(m.created_at).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
+                      {m.mine &&
+                        (m.read_at ? (
+                          <CheckCheck className="h-3 w-3 text-gold" />
+                        ) : (
+                          <Check className="h-3 w-3 text-white/40" />
+                        ))}
                     </span>
                   </div>
                 </div>

@@ -6,7 +6,16 @@ import {
   useState,
   useCallback,
 } from "react";
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff } from "lucide-react";
+import {
+  Phone,
+  PhoneOff,
+  Mic,
+  MicOff,
+  Video,
+  VideoOff,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../lib/supabase.js";
 import { useAuth } from "./AuthContext.jsx";
 import { useToast } from "./ToastContext.jsx";
@@ -38,6 +47,8 @@ export function CallProvider({ children }) {
   const [remoteStream, setRemoteStream] = useState(null);
   const [muted, setMuted] = useState(false);
   const [camOff, setCamOff] = useState(false);
+  const [speakerOff, setSpeakerOff] = useState(false);
+  const [ringing, setRinging] = useState(false); // callee's device is ringing
 
   const pcRef = useRef(null);
   const localRef = useRef(null);
@@ -46,30 +57,41 @@ export function CallProvider({ children }) {
   const pendingIceRef = useRef([]);
   const ringRef = useRef(null);
 
-  // --- ringtone (repeating soft beep) ---
+  // --- ringtone (classic dual-tone ringback: ~1s ring, 2s silence) ---
   const startRing = useCallback(() => {
     if (ringRef.current) return;
-    const beep = () => {
+    const ring = () => {
       try {
         const Ctx = window.AudioContext || window.webkitAudioContext;
         const ctx = new Ctx();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g);
-        g.connect(ctx.destination);
-        o.frequency.value = 520;
-        g.gain.setValueAtTime(0.0001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
-        o.start();
-        o.stop(ctx.currentTime + 0.5);
-        o.onended = () => ctx.close();
+        const now = ctx.currentTime;
+        [440, 480].forEach((f) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = "sine";
+          o.frequency.value = f;
+          o.connect(g);
+          g.connect(ctx.destination);
+          g.gain.setValueAtTime(0.0001, now);
+          g.gain.exponentialRampToValueAtTime(0.09, now + 0.02);
+          g.gain.setValueAtTime(0.09, now + 0.95);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+          o.start(now);
+          o.stop(now + 1.0);
+        });
+        setTimeout(() => {
+          try {
+            ctx.close();
+          } catch {
+            /* ignore */
+          }
+        }, 1300);
       } catch {
         /* ignore */
       }
     };
-    beep();
-    ringRef.current = setInterval(beep, 1400);
+    ring();
+    ringRef.current = setInterval(ring, 3000);
   }, []);
 
   const stopRing = useCallback(() => {
@@ -176,6 +198,8 @@ export function CallProvider({ children }) {
     setRemoteStream(null);
     setMuted(false);
     setCamOff(false);
+    setSpeakerOff(false);
+    setRinging(false);
     setStatus("idle");
     setPeer({ id: null, name: "" });
   }, [stopRing]);
@@ -190,6 +214,7 @@ export function CallProvider({ children }) {
       if (!targetId) return;
       try {
         setWithVideo(video);
+        setRinging(false);
         setPeer({ id: targetId, name: targetName || "Contact" });
         peerIdRef.current = targetId;
         const stream = await getMedia(video);
@@ -255,6 +280,12 @@ export function CallProvider({ children }) {
           setWithVideo(!!p.video);
           setStatus("incoming");
           startRing();
+          // let the caller know we're actually ringing
+          signal(p.from, "ringing");
+          break;
+        }
+        case "ringing": {
+          if (status === "outgoing") setRinging(true);
           break;
         }
         case "cancel": {
@@ -357,6 +388,7 @@ export function CallProvider({ children }) {
     setCamOff(next);
     localRef.current?.getVideoTracks().forEach((t) => (t.enabled = !next));
   };
+  const toggleSpeaker = () => setSpeakerOff((v) => !v);
 
   return (
     <CallContext.Provider value={{ startCall, status }}>
@@ -365,16 +397,19 @@ export function CallProvider({ children }) {
         status={status}
         peer={peer}
         withVideo={withVideo}
+        ringing={ringing}
         localStream={localStream}
         remoteStream={remoteStream}
         muted={muted}
         camOff={camOff}
+        speakerOff={speakerOff}
         onAccept={accept}
         onDecline={decline}
         onCancel={cancel}
         onHangup={hangup}
         onToggleMute={toggleMute}
         onToggleCam={toggleCam}
+        onToggleSpeaker={toggleSpeaker}
       />
     </CallContext.Provider>
   );
@@ -384,16 +419,19 @@ function CallOverlay({
   status,
   peer,
   withVideo,
+  ringing,
   localStream,
   remoteStream,
   muted,
   camOff,
+  speakerOff,
   onAccept,
   onDecline,
   onCancel,
   onHangup,
   onToggleMute,
   onToggleCam,
+  onToggleSpeaker,
 }) {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -402,8 +440,11 @@ function CallOverlay({
     if (localVideoRef.current) localVideoRef.current.srcObject = localStream;
   }, [localStream, status]);
   useEffect(() => {
-    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remoteStream;
-  }, [remoteStream, status]);
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = remoteStream;
+      remoteVideoRef.current.muted = speakerOff;
+    }
+  }, [remoteStream, status, speakerOff]);
 
   if (status === "idle") return null;
 
@@ -439,7 +480,7 @@ function CallOverlay({
             <div className="text-center">
               <p className="text-xl font-semibold">{peer.name}</p>
               <p className="text-sm text-white/60">
-                {status === "outgoing" && "Calling…"}
+                {status === "outgoing" && (ringing ? "Ringing…" : "Calling…")}
                 {status === "incoming" && "Incoming call…"}
                 {status === "connected" && "Connected"}
               </p>
@@ -491,9 +532,22 @@ function CallOverlay({
                 className={`flex h-12 w-12 items-center justify-center rounded-full ${
                   muted ? "bg-white/20" : "bg-white/10"
                 } text-white`}
-                aria-label="Mute"
+                aria-label="Mute microphone"
               >
                 {muted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+              </button>
+              <button
+                onClick={onToggleSpeaker}
+                className={`flex h-12 w-12 items-center justify-center rounded-full ${
+                  speakerOff ? "bg-white/20" : "bg-white/10"
+                } text-white`}
+                aria-label="Speaker"
+              >
+                {speakerOff ? (
+                  <VolumeX className="h-5 w-5" />
+                ) : (
+                  <Volume2 className="h-5 w-5" />
+                )}
               </button>
               {withVideo && (
                 <button
