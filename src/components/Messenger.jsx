@@ -13,11 +13,10 @@ import {
   sendMessage,
   markThreadRead,
   uploadChatImage,
-  callRoomFor,
 } from "../services/messages.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
-import CallModal from "./CallModal.jsx";
+import { useCall } from "../context/CallContext.jsx";
 
 // Short notification beep (no audio file needed).
 function playBeep() {
@@ -48,6 +47,7 @@ function playBeep() {
 export default function Messenger() {
   const { user, profile } = useAuth();
   const toast = useToast();
+  const { startCall } = useCall();
   const [params, setParams] = useSearchParams();
 
   const [conversations, setConversations] = useState([]);
@@ -56,7 +56,6 @@ export default function Messenger() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
-  const [callOpen, setCallOpen] = useState(false);
   const bottomRef = useRef(null);
   const prevLenRef = useRef(0);
 
@@ -225,7 +224,7 @@ export default function Messenger() {
                 <span className="font-semibold text-charcoal">{headerName}</span>
               </div>
               <button
-                onClick={() => setCallOpen(true)}
+                onClick={() => startCall(activeId, headerName, true)}
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/10 text-gold transition hover:bg-gold hover:text-white"
                 aria-label="Call"
               >
@@ -302,13 +301,6 @@ export default function Messenger() {
           </>
         )}
       </div>
-
-      <CallModal
-        open={callOpen}
-        onClose={() => setCallOpen(false)}
-        room={user && activeId ? callRoomFor(user.id, activeId) : "swissproperty"}
-        displayName={profile?.fullName || "Guest"}
-      />
     </div>
   );
 }

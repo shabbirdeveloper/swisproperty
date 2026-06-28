@@ -5,6 +5,7 @@ import Footer from "./components/Footer.jsx";
 import { SavedProvider } from "./context/SavedContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { ToastProvider } from "./context/ToastContext.jsx";
+import { CallProvider } from "./context/CallContext.jsx";
 import RequireRole from "./components/admin/RequireRole.jsx";
 import { supabase, isSupabaseConfigured } from "./lib/supabase.js";
 
@@ -90,6 +91,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
+        <CallProvider>
         <SavedProvider>
           <ScrollToTop />
           <RecoveryRedirect />
@@ -174,6 +176,7 @@ export default function App() {
           {!isBare && <Footer />}
         </div>
         </SavedProvider>
+        </CallProvider>
       </ToastProvider>
     </AuthProvider>
   );
