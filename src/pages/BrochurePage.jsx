@@ -24,8 +24,6 @@ import { imgUrl, imgLabel } from "../utils/media.js";
  * paired two-per-page. (`oneUp()` is the single switch to tune that heuristic.)
  */
 
-const BRAND_LINE = "www.swissproperty.ch · +41 44 123 45 67 · hello@swissproperty.ch";
-
 // Google Maps embed centered on the EXACT address, zoomed to street level.
 // `property.mapImage` (admin-uploaded map) takes priority when present.
 function buildMapEmbed(property) {
@@ -41,29 +39,9 @@ function chunkPairs(arr) {
   return out;
 }
 
-function Band({ position, page }) {
-  const isTop = position === "top";
-  return (
-    <div className={`br-band br-band-${position}`}>
-      {isTop ? (
-        <>
-          <span className="br-logo">
-            Swiss<span className="br-logo-gold">Property</span>
-          </span>
-          <span className="br-tagline">PREMIUM REAL ESTATE</span>
-        </>
-      ) : (
-        <>
-          <span className="br-foot">{BRAND_LINE}</span>
-          {page != null && (
-            <span className="br-page-no">
-              {String(page).padStart(2, "0")}
-            </span>
-          )}
-        </>
-      )}
-    </div>
-  );
+// Bands are intentionally empty — solid charcoal bars with the gold line only.
+function Band({ position }) {
+  return <div className={`br-band br-band-${position}`} />;
 }
 
 function Page({ children, page }) {
